@@ -1,0 +1,60 @@
+name: Newman tests and Python analysis
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Install Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install Newman
+      run: npm install -g newman
+
+    - name: Run Postman collection and export JSON report
+      run: newman run postman/jsonplaceholder_tests.postman_collection.json -r json --reporter-json-export newman-report.json
+
+    - name: Save JSON report
+      uses: actions/upload-artifact@v4
+      with:
+        name: newman-json-report
+        path: newman-report.json
+
+  analyze:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Download JSON report
+      uses: actions/download-artifact@v4
+      with:
+        name: newman-json-report
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: pip install pandas matplotlib
+
+    - name: Run analysis script
+      run: python analyze_report.py
+
+    - name: Save analysis outputs
+      uses: actions/upload-artifact@v4
+      with:
+        name: python-analysis
+        path: "*.png"
