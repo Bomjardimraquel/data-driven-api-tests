@@ -5,17 +5,29 @@ import matplotlib.pyplot as plt
 with open("newman-report.json") as f:
     data = json.load(f)
 
-executions = data["run"]["executions"]
+executions = data.get("run", {}).get("executions", [])
 
-df = pd.DataFrame([{
-    "request": e["item"]["name"],
-    "status": e["response"]["status"],
-    "code": e["response"]["code"],
-    "time_ms": e["response"]["responseTime"],
-    "tests_total": len(e["assertions"]),
-    "tests_passed": sum(1 for a in e["assertions"] if a["error"] is None),
-    "tests_failed": sum(1 for a in e["assertions"] if a["error"] is not None)
-} for e in executions])
+rows = []
+for e in executions:
+    item = e.get("item", {})
+    resp = e.get("response", {}) or {}
+
+    assertions = e.get("assertions", []) or []
+    tests_total = len(assertions)
+    tests_failed = sum(1 for a in assertions if a.get("error") is not None)
+    tests_passed = tests_total - tests_failed
+
+    rows.append({
+        "request": item.get("name", "sem-nome"),
+        "status": resp.get("status", "sem-status"),
+        "code": resp.get("code", 0),
+        "time_ms": resp.get("responseTime", 0),
+        "tests_total": tests_total,
+        "tests_passed": tests_passed,
+        "tests_failed": tests_failed
+    })
+
+df = pd.DataFrame(rows)
 
 print("Resumo dos testes:\n", df)
 
@@ -35,16 +47,21 @@ df["code"].value_counts().plot(kind="bar")
 plt.title("Distribuição de Status Codes")
 plt.xlabel("Código HTTP")
 plt.ylabel("Quantidade")
+plt.tight_layout()
 plt.savefig("grafico_status_codes.png")
 
 df.groupby("request")["time_ms"].mean().plot(kind="bar")
 plt.title("Tempo médio de resposta por requisição")
 plt.ylabel("ms")
+plt.tight_layout()
 plt.savefig("grafico_tempo_medio.png")
 
-(df["tests_passed"] / df["tests_total"]).plot(kind="bar")
+taxa = (df["tests_passed"] / df["tests_total"]).fillna(0)
+taxa.index = df["request"]
+taxa.plot(kind="bar")
 plt.title("Taxa de sucesso por requisição")
 plt.ylabel("Proporção")
+plt.tight_layout()
 plt.savefig("grafico_taxa_sucesso_por_request.png")
 
 df.to_csv("resumo_teste.csv", index=False)
