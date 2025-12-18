@@ -2,6 +2,8 @@ import json
 import pandas as pd
 import matplotlib.pyplot as plt
 
+plt.style.use("ggplot") 
+
 with open("newman-report.json") as f:
     data = json.load(f)
 
@@ -11,8 +13,8 @@ rows = []
 for e in executions:
     item = e.get("item", {})
     resp = e.get("response", {}) or {}
-
     assertions = e.get("assertions", []) or []
+
     tests_total = len(assertions)
     tests_failed = sum(1 for a in assertions if a.get("error") is not None)
     tests_passed = tests_total - tests_failed
@@ -29,8 +31,9 @@ for e in executions:
 
 df = pd.DataFrame(rows)
 
-print("Resumo dos testes:\n", df)
+df.to_csv("resumo_teste.csv", index=False)
 
+plt.figure(figsize=(10, 6))
 df.plot(x="request", y="time_ms", kind="bar", legend=False)
 plt.ylabel("Tempo de resposta (ms)")
 plt.title("Performance por requisição")
@@ -38,31 +41,40 @@ plt.xticks(rotation=45)
 plt.tight_layout()
 plt.savefig("grafico_tempo_resposta.png")
 
-df[["tests_passed","tests_failed"]].sum().plot(kind="pie", autopct="%1.1f%%")
-plt.title("Taxa de sucesso dos testes")
+plt.figure(figsize=(6, 6))
+df_total = df[["tests_passed", "tests_failed"]].sum()
+df_total.plot(kind="pie", labels=["Passaram", "Falharam"], autopct="%1.1f%%", colors=["#4CAF50", "#F44336"])
+plt.title("Taxa geral de sucesso dos testes")
 plt.ylabel("")
+plt.tight_layout()
 plt.savefig("grafico_taxa_sucesso.png")
 
-df["code"].value_counts().plot(kind="bar")
+plt.figure(figsize=(8, 5))
+df["code"].value_counts().sort_index().plot(kind="bar", color="#2196F3")
 plt.title("Distribuição de Status Codes")
 plt.xlabel("Código HTTP")
 plt.ylabel("Quantidade")
 plt.tight_layout()
 plt.savefig("grafico_status_codes.png")
 
-df.groupby("request")["time_ms"].mean().plot(kind="bar")
+plt.figure(figsize=(10, 6))
+df.groupby("request")["time_ms"].mean().plot(kind="bar", color="#FF9800")
 plt.title("Tempo médio de resposta por requisição")
 plt.ylabel("ms")
+plt.xticks(rotation=45)
 plt.tight_layout()
 plt.savefig("grafico_tempo_medio.png")
 
+plt.figure(figsize=(10, 6))
 taxa = (df["tests_passed"] / df["tests_total"]).fillna(0)
 taxa.index = df["request"]
-taxa.plot(kind="bar")
+taxa.plot(kind="bar", color="#9C27B0")
 plt.title("Taxa de sucesso por requisição")
 plt.ylabel("Proporção")
+plt.xticks(rotation=45)
 plt.tight_layout()
 plt.savefig("grafico_taxa_sucesso_por_request.png")
 
-df.to_csv("resumo_teste.csv", index=False)
+print("Relatórios gerados com sucesso!")
+
 
