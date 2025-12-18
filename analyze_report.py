@@ -2,7 +2,8 @@ import json
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Carregar o relatório
+plt.style.use("ggplot") 
+
 with open("newman-report.json") as f:
     data = json.load(f)
 
@@ -30,10 +31,8 @@ for e in executions:
 
 df = pd.DataFrame(rows)
 
-# Salvar CSV
 df.to_csv("resumo_teste.csv", index=False)
 
-# Gráfico 1: Tempo de resposta por requisição
 plt.figure(figsize=(10, 6))
 df.plot(x="request", y="time_ms", kind="bar", legend=False)
 plt.ylabel("Tempo de resposta (ms)")
@@ -42,41 +41,41 @@ plt.xticks(rotation=45)
 plt.tight_layout()
 plt.savefig("grafico_tempo_resposta.png")
 
-# Gráfico 2: Taxa geral de sucesso
+
 plt.figure(figsize=(6, 6))
 df_total = df[["tests_passed", "tests_failed"]].sum()
-df_total.plot(kind="pie", labels=["Passaram", "Falharam"], autopct="%1.1f%%")
+df_total.plot(kind="pie", labels=["Passaram", "Falharam"], autopct="%1.1f%%", colors=["#4CAF50", "#F44336"])
 plt.title("Taxa geral de sucesso dos testes")
 plt.ylabel("")
 plt.tight_layout()
 plt.savefig("grafico_taxa_sucesso.png")
 
-# Gráfico 3: Distribuição de status codes
 plt.figure(figsize=(8, 5))
-df["code"].value_counts().sort_index().plot(kind="bar")
+df["code"].value_counts().sort_index().plot(kind="bar", color="#2196F3")
 plt.title("Distribuição de Status Codes")
 plt.xlabel("Código HTTP")
 plt.ylabel("Quantidade")
 plt.tight_layout()
 plt.savefig("grafico_status_codes.png")
 
-# Gráfico 4: Tempo médio por requisição
 plt.figure(figsize=(10, 6))
-df.groupby("request")["time_ms"].mean().plot(kind="bar")
+df.groupby("request")["time_ms"].mean().plot(kind="bar", color="#FF9800")
 plt.title("Tempo médio de resposta por requisição")
 plt.ylabel("ms")
 plt.xticks(rotation=45)
 plt.tight_layout()
 plt.savefig("grafico_tempo_medio.png")
 
-# Gráfico 5: Taxa de sucesso por requisição
 plt.figure(figsize=(10, 6))
 taxa = (df["tests_passed"] / df["tests_total"]).fillna(0)
 taxa.index = df["request"]
-taxa.plot(kind="bar")
+taxa.plot(kind="bar", color="#9C27B0")
 plt.title("Taxa de sucesso por requisição")
 plt.ylabel("Proporção")
 plt.xticks(rotation=45)
 plt.tight_layout()
 plt.savefig("grafico_taxa_sucesso_por_request.png")
+
+print("✅ Relatórios gerados com sucesso!")
+
 
