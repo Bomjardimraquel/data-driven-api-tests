@@ -5,10 +5,10 @@ Este projeto tem como objetivo realizar testes automatizados em APIs públicas u
 
 # Ferramentas utilizadas
 
-Postman → criação e execução de coleções de testes
-Newman → execução automatizada das coleções via CLI
-GitHub Actions → automação do fluxo de testes e análise
-Python → análise dos relatórios (Pandas, Matplotlib)
+Postman → criação e execução de coleções de testes                 
+Newman → execução automatizada das coleções via CLI                  
+GitHub Actions → automação do fluxo de testes e análise                 
+Python → análise dos relatórios (Pandas, Matplotlib)                         
 JSONPlaceholder API → API pública usada para os testes
 
 # Estrutura do projeto
