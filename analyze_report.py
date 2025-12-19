@@ -76,6 +76,6 @@ plt.xticks(rotation=45)
 plt.tight_layout()
 plt.savefig("grafico_taxa_sucesso_por_request.png")
 
-print("✅ Relatórios gerados com sucesso!")
+print("🆗 Relatórios gerados com sucesso!")
 
 
