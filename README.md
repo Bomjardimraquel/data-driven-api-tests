@@ -1,42 +1,49 @@
 # Data-Driven API Tests
 
-## Descrição
+# Descrição
+Este projeto tem como objetivo realizar testes automatizados em APIs públicas utilizando Postman e Newman, com integração contínua via GitHub Actions e análise dos resultados em Python. A proposta é transformar a execução dos testes em insights estratégicos, através de gráficos e métricas que apoiam decisões sobre qualidade de software.
 
-Este projeto tem como objetivo realizar testes automatizados em APIs públicas utilizando **Postman** e **Newman**, com análise dos resultados em **Python**. A ideia é transformar a execução dos testes em **insights estratégicos**, através de gráficos e métricas que apoiam decisões sobre qualidade de software.
+# Ferramentas utilizadas
 
-## Ferramentas utilizadas
+Postman → criação e execução de coleções de testes
+Newman → execução automatizada das coleções via CLI
+GitHub Actions → automação do fluxo de testes e análise
+Python → análise dos relatórios (Pandas, Matplotlib)
+JSONPlaceholder API → API pública usada para os testes
 
-- [Postman](https://www.postman.com/) → criação e execução de coleções de testes.
-- [Newman](https://www.npmjs.com/package/newman) → execução automatizada das coleções via CLI.
-- [Python](https://www.python.org/) → análise dos relatórios (Pandas, Matplotlib, Seaborn).
-- [ReqRes API](https://reqres.in/) → API pública usada para os testes.
+# Estrutura do projeto
 
-## Estrutura do projeto
+data-driven-api-tests/                         
+.github/workflows/ newman-analysis.yml e newman_tests.yml                                      
+postman/ jsonplaceholder_tests.postman_collection.json               
+README.md      
+analyze_report.py                 
 
-data-driven-api-tests/ 
-│ 
-├── postman/ # Coleções e ambientes do Postman 
-├── reports/ # Resultados exportados (CSV/JSON via Newman) 
-├── analysis/ # Scripts Python para análise 
-└── README.md # Documentação do projeto
 
-## Como rodar
+# Como rodar
 
-1. Clone este repositório.
-2. Instale o Newman:   ```bash
-   npm install -g newman
-3. Execute a coleção:
-   newman run postman/collection.json -r json,html
-4. Analise os relatórios com python:
-   jupyter notebook analysis/analysis.ipynb
+* Clone o repositório:
+git clone https://github.com/Bomjardimraquel/data-driven-api-tests.git
+cd data-driven-api-tests
+
+* Instale o Newman:
+npm install -g newman
+
+* Execute a coleção:
+newman run postman/jsonplaceholder_tests.postman_collection.json -r json,html
+
+* Analise os relatórios com Python:
+python analyze_report.py
 
 ## Resultados esperados
 
--> Gráficos de sucesso vs falha.
+-> Gráficos de sucesso vs falha
 
--> Tempo médio de resposta por endpoint.
+-> Tempo médio de resposta por endpoint
 
--> Distribuição de status codes.
+-> Distribuição de status codes
+
+-> Taxa de sucesso por requisição
 
 ## Licença
 
